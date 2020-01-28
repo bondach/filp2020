@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+	    <div class="reveal">
+			<div class="slides">
+
+				<section>
+					<h2>Трейты в Scala</h2>
+					<h4>Лекция 2</h4>
+				</section>
+
+
+				<section id="fragments">
+					<style type="text/css">
+						.leftAlign { text-align: left; }
+						</style>
+					<h2>Цели</h2>
+					<p class="fragment leftAlign">1. Интерфейсы, примеси, типажи</p>
+					<p class="fragment leftAlign">2. Множественное наследование</p>
+					<p class="fragment leftAlign">3. Иерархия типов в Scala</p>
+					<p class="fragment leftAlign">4. Подводные камни</p>
+					<p class="fragment leftAlign">5. Линеаризация трейтов</p>
+					<p class="fragment leftAlign">6. Self annotation type</p>
+					<p class="fragment leftAlign">6. Параметризация трейтов</p>
+					<p class="fragment leftAlign">7. Type classes</p>
+				</section>
+
+				<section>
+					<p class="leftAlign"><b>Интерфейсы</b> - реализуют принцип программирования по контракту, 
+						т.е. мы объявляем набор методов, которые мы обязуемся определить при необходимости
+					</p>
+				</section>
+
+				<section id="fragments">
+					<h4>Пример использования интерфейсов</h4>
+					<pre><code class="hljs" data-trim>
+
+trait UsersRepo {
+  def getNameById(id: Long): String
+}
+
+class SomethingDoerService(userRepo: UsersRepo) {
+  def doSmth(id: Long): Unit = 
+    println(s"I do something with ${userRepo.getById(id)}")
+}
+					</code></pre>
+					<pre class="fragment"><code class="hljs" data-trim>
+class UsersRepoStub extends UsersRepo {
+  def getNameByid(id: Long): String = "Name"
+}
+
+val doer = new SomethingDoerService(new UsersRepoStub)
+
+doer.doSmth(42)
+					</code></pre>
+				</section>
+
+				<section>
+					<p class="leftAlign"><b>Примеси</b> - используются тогда, когда мы хотим добавить какой-либо сущности функциональности,
+					но не более того</p>
+				</section>
+
+				<section id="fragments">
+					<h4>Пример примесей</h4>
+					<pre class="fragment"><code class="hljs" data-trim>
+
+trait Jumper {
+  def jump: Unit = println("I can jump!")
+}
+					</code></pre>
+					<pre class="fragment"><code class="hljs" data-trim>
+class Person extends Jumper {
+  def speak: Unit = println("I can speak!")
+}
+
+val person = new Person
+person.speak
+person.jump
+					</code></pre>
+					<pre class="fragment"><code class="hljs" data-trim>
+class Person {
+  def speak: Unit = println("I can speak!")
+}
+
+val person = new Person with Jumper
+
+person.speak
+person.jump
+					</code></pre>
+				</section>
+
+				<section>
+
+				</section>
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
