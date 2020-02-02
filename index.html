@@ -1,61 +1,60 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>reveal.js</title>
 
-		<link rel="stylesheet" href="css/reset.css">
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/moon.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/moon.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/monokai.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-	    <div class="reveal">
-			<div class="slides">
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+      <div class="reveal">
+      <div class="slides">
+        <section>
+          <h2>Трейты в Scala</h2>
+          <h4>Лекция 2</h4>
+        </section>
 
-				<section>
-					<h2>Трейты в Scala</h2>
-					<h4>Лекция 2</h4>
-				</section>
 
+        <section id="fragments">
+          <style type="text/css">
+            .leftAlign { text-align: left; }
+            </style>
+          <h2>Цели</h2>
+          <p class="fragment leftAlign">1. Интерфейсы, примеси</p>
+          <p class="fragment leftAlign">2. Иерархия типов в Scala</p>
+          <p class="fragment leftAlign">3. Подводные камни</p>
+          <p class="fragment leftAlign">4. Множественное наследование</p>
+          <p class="fragment leftAlign">5. Линеаризация трейтов</p>
+          <p class="fragment leftAlign">6. Self annotation type</p>
+          <p class="fragment leftAlign">7. Параметризация трейтов</p>
+          <p class="fragment leftAlign">8. Type classes</p>
+        </section>
 
-				<section id="fragments">
-					<style type="text/css">
-						.leftAlign { text-align: left; }
-						</style>
-					<h2>Цели</h2>
-					<p class="fragment leftAlign">1. Интерфейсы, примеси</p>
-					<p class="fragment leftAlign">2. Множественное наследование</p>
-					<p class="fragment leftAlign">3. Иерархия типов в Scala</p>
-					<p class="fragment leftAlign">4. Подводные камни</p>
-					<p class="fragment leftAlign">5. Линеаризация трейтов</p>
-					<p class="fragment leftAlign">6. Self annotation type</p>
-					<p class="fragment leftAlign">6. Параметризация трейтов</p>
-					<p class="fragment leftAlign">7. Type classes</p>
-				</section>
+        <section>
+          <p class="leftAlign"><b>Интерфейсы</b> - реализуют принцип программирования по контракту, 
+            т.е. мы объявляем набор методов, которые мы обязуемся определить при необходимости
+          </p>
+        </section>
 
-				<section>
-					<p class="leftAlign"><b>Интерфейсы</b> - реализуют принцип программирования по контракту, 
-						т.е. мы объявляем набор методов, которые мы обязуемся определить при необходимости
-					</p>
-				</section>
-
-				<section id="fragments">
-					<h4>Пример использования интерфейсов</h4>
-					<pre><code class="hljs" data-trim>
+        <section id="fragments">
+          <h4>Пример использования интерфейсов</h4>
+          <pre><code class="hljs" data-trim>
 
 trait UsersRepo {
   def getNameById(id: Long): String
@@ -65,8 +64,8 @@ class SomethingDoerService(userRepo: UsersRepo) {
   def doSmth(id: Long): Unit = 
     println(s"I do something with ${userRepo.getById(id)}")
 }
-					</code></pre>
-					<pre class="fragment"><code class="hljs" data-trim>
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>
 class UsersRepoStub extends UsersRepo {
   def getNameByid(id: Long): String = "Name"
 }
@@ -74,23 +73,23 @@ class UsersRepoStub extends UsersRepo {
 val doer = new SomethingDoerService(new UsersRepoStub)
 
 doer.doSmth(42)
-					</code></pre>
-				</section>
+          </code></pre>
+        </section>
 
-				<section>
-					<p class="leftAlign"><b>Примеси</b> - используются тогда, когда мы хотим добавить какой-либо сущности функциональности,
-					но не более того</p>
-				</section>
+        <section>
+          <p class="leftAlign"><b>Примеси</b> - используются тогда, когда мы хотим добавить какой-либо сущности функциональности,
+          но не более того</p>
+        </section>
 
-				<section id="fragments">
-					<h4>Пример примесей</h4>
-					<pre class="fragment"><code class="hljs" data-trim>
+        <section id="fragments">
+          <h4>Пример примесей</h4>
+          <pre class="fragment"><code class="hljs" data-trim>
 
 trait Jumper {
   def jump: Unit = println("I can jump!")
 }
-					</code></pre>
-					<pre class="fragment"><code class="hljs" data-trim>
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>
 class Person extends Jumper {
   def speak: Unit = println("I can speak!")
 }
@@ -98,8 +97,8 @@ class Person extends Jumper {
 val person = new Person
 person.speak
 person.jump
-					</code></pre>
-					<pre class="fragment"><code class="hljs" data-trim>
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>
 class Person {
   def speak: Unit = println("I can speak!")
 }
@@ -108,38 +107,127 @@ val person = new Person with Jumper
 
 person.speak
 person.jump
-					</code></pre>
-				</section>
+          </code></pre>
+        </section>
 
-				<section>
+        <section>
 
-					<p class="leftAlign">
-						Граница между такими языковыми концептами как интерфейсы, типажи(трейты), примеси весьма размыта
-						и, в scala в частности, эта терминология используется лишь в зависимости от контекста и места использования.
-					</p>
-				</section>
+          <p class="leftAlign">
+            Граница между такими языковыми концептами как интерфейсы, типажи(трейты), примеси весьма размыта
+            и, в scala в частности, эта терминология используется лишь в зависимости от контекста и места использования.
+          </p>
+        </section>
 
-				<section>
-					<h4>Множественное наследование</h4>
-					<h6>Проблема</h6>
-				</section>
-			</div>
-		</div>
+        <section>
 
-		<script src="js/reveal.js"></script>
+          <h4>Иерархия типов</h4>
+          <img src="scala-types-diagram.svg"></img>
+        </section>
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true }
-				]
-			});
-		</script>
-	</body>
+        <section id="fragments">
+          <h4>Иерархия типов</h4>
+          <p class="fragment leftAlign"><b>Типы-значения(AnyVal)</b> - количество памяти известно на этапе компиляции</p>
+          <p class="fragment leftAlign"><b>Ссылочные типы(AnyRef)</b> - количество памяти определяется в рантайме</p>
+          <p class="fragment leftAlign"><b>Null</b> - подтип всех ссылочных типов</p>
+          <p class="fragment leftAlign"><b>Nothing</b> - подтип для всех типов (зачем ?)</p>
+        </section >
+
+        <section id="fragments">
+          <h4>Иерархия типов</h4>
+          <p class="leftAlign"><b>Nothing</b> - используется в качестве терминального типа. Он удобен, 
+            когда мы описываем некоторую модель и хотим подчеркнуть отсутствие чего-либо.</p>
+            <pre class="fragment"><code class="hljs" data-trim>
+trait Maybe[+A]
+class Just[A](el: A) extends Maybe[A]
+object None extends Maybe[Nothing]
+            </code></pre>
+        </section >
+
+        <section>
+          <h4>Иерархия типов</h4>
+          <p class="leftAlign">Каждый созданный пользователем тип автоматически наследуется от AnyRef</p >
+          <object type="image/svg+xml" data="trait-hierarchy.svg" height=400>
+          </object>
+        </section>
+
+        <section id="fragments">
+
+          <h4>Подводные камни</h4>
+          <pre class="fragment"><code class="hljs" data-trim>
+trait Foo {
+  val str: String
+  val str2: String = s"str has length ${str.length()}"
+}
+
+class Bar extends Foo {
+  override val str = "cheburek"
+}
+          </code></pre>
+
+          <pre class="fragment"><code class="hljs" data-trim>
+val b = new Bar
+          </code></pre>
+        </section>
+
+        <section>
+
+          <h4>Подводные камни</h4>
+          <h5>Порядок конструирования типов</h5>
+          <p class="leftAlign"></p>
+          <p class="leftAlign"></p>
+          <p class="leftAlign"></p>
+          <p class="leftAlign"></p>
+        </section>
+
+        <section id="fragments">
+          <h4>Подводные камни</h4>
+          <h5>Пути решения</h5>
+          <pre class="fragment"><code class="hljs" data-trim>
+
+trait Foo {
+  val str: String
+  lazy val str2: String = s"str han length ${str.length()}
+}
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>
+class Bar {
+  override val str = "cheburek"
+} with Foo   // так делать не приветствуется
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>
+
+          </code></pre>
+        </section >
+
+
+        <section id="fragments">
+          <h4>Множественное наследование</h4>
+          <h6>Проблема</h6>
+          <object type="image/svg+xml" data="diamond2.svg" width=600 height=400>
+          </object>
+          <pre class="fragment"><code class="hljs" data-trim>
+> val o = new OMG
+> println(o.foo)
+          </code></pre>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true }
+        ]
+      });
+    </script>
+  </body>
 </html>
