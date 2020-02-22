@@ -24,6 +24,7 @@
   </head>
   <body>
       <div class="reveal">
+
       <div class="slides">
         <section>
           <h2>Трейты в Scala</h2>
@@ -37,13 +38,14 @@
             </style>
           <h2>Цели</h2>
           <p class="fragment leftAlign">1. Интерфейсы, примеси</p>
-          <p class="fragment leftAlign">2. Иерархия типов в Scala</p>
-          <p class="fragment leftAlign">3. Подводные камни</p>
-          <p class="fragment leftAlign">4. Параметризация трейтов</p>
-          <p class="fragment leftAlign">5. Self annotation type</p>
-          <p class="fragment leftAlign">6. Множественное наследование</p>
-          <p class="fragment leftAlign">7. Линеаризация трейтов</p>
-          <p class="fragment leftAlign">8*. Type classes</p>
+          <p class="fragment leftAlign">2. Основной синтаксис</p>
+          <p class="fragment leftAlign">3. Иерархия типов в Scala</p>
+          <p class="fragment leftAlign">4. Подводные камни</p>
+          <p class="fragment leftAlign">5. Параметризация трейтов</p>
+          <p class="fragment leftAlign">6. Self annotation type</p>
+          <p class="fragment leftAlign">7. Множественное наследование</p>
+          <p class="fragment leftAlign">8. Линеаризация трейтов</p>
+          <p class="fragment leftAlign">9*. Type classes</p>
         </section>
 
         <section>
@@ -111,17 +113,86 @@ person.jump
         </section>
 
         <section>
-
           <p class="leftAlign">
             Граница между такими языковыми концептами как интерфейсы, типажи(трейты), примеси весьма размыта
             и, в scala в частности, эта терминология используется лишь в зависимости от контекста и места использования.
           </p>
         </section>
+        <section id="fragments">
+          <h4>Синтаксис</h4>
+          <pre class="fragment"><code = class="hljs" data-trim>
 
+trait Foo
+          </code></pre>
+          <pre class="fragment"><code = class="hljs" data-trim>
+trait Foo {
+  val foo: String
+  def fooDef: Int
+}
+          </code></pre>
+          <pre class = "fragment"><code = class="hljs" data-trim>
+class Bar extends Foo {
+  val foo: String = "Bar"
+  def fooDef: Int = 42
+}
+          </code></pre>
+          <pre class = "fragment"><code = class="hljs" data-trim>
+class Bar(val foo: String) extends Foo {
+  def fooDef: Int = 42
+}
+          </code></pre>
+        </section>
+
+        <section id="fragments">
+
+          <h4>Синтаксис</h4>
+          <pre class="fragment"><code = class="hljs" data-trim>
+trait Foo {
+  val foo: String = "Foo"
+}
+          </code></pre>
+          <pre class="fragment"><code = class="hljs" data-trim>
+
+class Bar extends Foo {
+  override val foo: String = "Bar"
+}
+          </code></pre>
+          <pre class = "fragment"><code = class="hljs" data-trim>
+class Bar(override val foo: String) extends Foo
+          </code></pre>
+        </section>
+
+        <section id="fragments">
+          <h4>Синтаксис</h4>
+          <pre class = "fragment"><code = class="hljs" data-trim>
+trait Foo {
+  def foo: String
+}
+
+trait Bar {
+  def bar: String
+}
+          </code></pre>
+          <pre class = "fragment"><code = class="hljs" data-trim>
+class Yee extends Foo with Bar {
+  def foo: String = "YeeFoo"
+  def bar: String = "YeeBar"
+}
+          </code></pre>
+        </section >
         <section>
+          <h4>Синтаксис</h4>
+          <pre><code = class="hljs">
+trait Foo {
+  def foo: String = "foo"
+}
 
-          <h4>Иерархия типов</h4>
-          <img src="scala-types-diagram.svg"></img>
+trait Bar extends Foo {
+  override def foo: String = super.foo ++ " bar"
+}
+          </code></pre>
+        </section>
+        <section data-background="scala-types-diagram.svg" data-background-size="100%">
         </section>
 
         <section id="fragments">
@@ -133,36 +204,36 @@ person.jump
         </section >
 
         <section id="fragments">
-          <h4>Иерархия типов</h4>
-          <p class="leftAlign"><b>Nothing</b> - используется в качестве терминального типа. Он удобен, 
+          <p class="leftAlign"><b>Nothing</b> - может использоваться для функций, которые ничего не возвращают</p>
+          <pre class = "fragment"><code class="hljs" data-trim>
+def loop(x: Int): Nothing = {
+  if (x >= 42) System.exit(0)
+  loop(x + 1)
+}
+          </code></pre>
+
+        </section>
+
+        <section id="fragments">
+          <p class="leftAlign"><b>Nothing</b> - так же может использоваться в качестве терминального типа. Он удобен, 
             когда мы описываем некоторую модель и хотим подчеркнуть отсутствие чего-либо.</p>
             <pre class="fragment"><code class="hljs" data-trim>
-trait Maybe[+A]
-class Just[A](el: A) extends Maybe[A]
-object None extends Maybe[Nothing]
+trait Option[+A]
+class Some[A](el: A) extends Option[A]
+object None extends Option[Nothing]
             </code></pre>
         </section >
 
         <section>
-
-          <h4>Иерархия типов</h4>
           <p class="leftAlign">Каждый созданный пользователем тип автоматически наследуется от AnyRef</p >
           <object type="image/svg+xml" data="trait-hierarchy.svg" height=400>
           </object>
         </section>
 
         <section>
-          <h4>Иерархия типов</h4>
-          <p class="leftAlign">Для доступа к переопределяемому родительскому методу используется ключевое слово <b>super</b></p>
-          <pre><code class="hljs" data-trim>
-trait Person {
-  def describe: String = "human"
-}
-
-trait Ordinary extends Person {
-  override def describe: String = "Ordinary " ++ super.describe
-}
-          </code></pre>
+          <h4>Порядок конструирования трейтов</h4>
+          <object type="image/svg+xml" data="construction.svg" height=600 width=600>
+          </object>
         </section>
 
         <section id="fragments">
@@ -189,7 +260,6 @@ val b = new Bar
           <h4>Подводные камни</h4>
           <h5>Пути решения</h5>
           <pre class="fragment"><code class="hljs" data-trim>
-
 trait Foo {
   val str: String
   lazy val str2: String = s"str han length ${str.length()}"
@@ -226,6 +296,7 @@ trait Bar[A <: Foo] {
         <section id="fragments">
 
           <h4>Ограничение наследования</h4>
+          <h6>Self annotation type</h6>
           <pre class="fragment"><code class="hljs" data-trim>
 trait Foo {
   def foo: String
@@ -268,18 +339,15 @@ trait Bar[A <: Foo] { self: A =>
           <h4>Множественное наследование</h4>
           <h6>Линеаризация</h6>
           <object type="image/svg+xml" data="linearization.svg" width=600 height=400></object>
-      </section>
-
-        <section id="fragments">
-
-          <h4>Множественное наследование</h4>
-          <h6>Линеаризация</h6>
           <pre><code class="hljs" data-trime>
 class G extends A with D with C with B
 val g = new G
 println(g.foo)
           </code></pre>
-          <pre class="fragment"><code class="hljs" data-trime>
+      </section>
+
+        <section>
+          <pre><code class="hljs" data-trime>
 > CBDA
           </code></pre>
         </section>
